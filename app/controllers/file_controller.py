@@ -4,7 +4,7 @@ Module for getting the required algo file.
 import os
 import platform
 import sys
-from typing import Iterable
+from typing import Iterable, Tuple
 
 from app.models.Exceptions.exceptions import AlgorithmNotFound
 from app.utils.platform_specific import format_path
@@ -29,10 +29,10 @@ class AlgorithmRepository(object):
         return ls
 
     @staticmethod
-    def get_algorithm_path(algorithm_name: str):
-        for class_ in AlgorithmRepository.__list_dir(os.getcwd()+'/'+ALGORITHM_ROOT_DIRECTORY):
-            for item in AlgorithmRepository.__list_dir(os.getcwd()+'/'+ALGORITHM_ROOT_DIRECTORY + class_):
+    def get_algorithm_path(algorithm_name: str) -> Tuple[str, str]:
+        for class_ in AlgorithmRepository.__list_dir(ALGORITHM_ROOT_DIRECTORY):
+            for item in AlgorithmRepository.__list_dir(ALGORITHM_ROOT_DIRECTORY + class_):
                 if item.split('.')[0].upper().strip() == algorithm_name.upper().strip():
-                    algorithm_path = os.getcwd()+'/'+ALGORITHM_ROOT_DIRECTORY+class_+'/'+item
-                    return format_path(algorithm_path)
+                    algorithm_path = ALGORITHM_ROOT_DIRECTORY+class_+'/'+item.split('.')[0]
+                    return format_path(algorithm_path), class_
         raise AlgorithmNotFound()

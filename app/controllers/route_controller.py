@@ -8,6 +8,7 @@ import subprocess
 from flask import Flask as Application, render_template, request
 
 from app.controllers.file_controller import AlgorithmRepository
+from app.models.input_processor import Algorithm
 from app.utils.platform_specific import format_path
 
 
@@ -43,22 +44,24 @@ class RouteController(object):
             return response
 
     def __execute(self):
-        @self._app.route('/execute/<algo>/<input_>', methods=['GET', 'POST'])
-        def render_view(algo, input_):
-            path_ = AlgorithmRepository.get_algorithm_path(algo)
+        @self._app.route('/execute', methods=['GET', 'POST'])
+        def render_view():
+            algorithm_name = request.form['algorithm']
+            algorithm_input = json.loads(request.form['input'])
 
-            formatted_input = ''
-            for arg in input_.split(','):
-                formatted_input += arg + ' '
+            algorithm = Algorithm(algorithm_name)
+            if algorithm.validate_input(algorithm_input):
+                path_, language = AlgorithmRepository.get_algorithm_path(algorithm_name)
+                formatted_input = algorithm.get_formatted_input(algorithm_input)
 
-            cmd = 'python ' + path_ + ' ' + formatted_input
-            print("CMD> ", cmd)
+                output = algorithm.execute(language, path_, formatted_input)
 
-            child = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
-            output = child.communicate()[0]
-            body = dict(status=dict(execution_time=1000, type='SUCCESS', message='Entered'),
-                        output=output.decode().strip())
-
+                body = dict(status=dict(execution_time=1000, type='SUCCESS', message='Entered'),
+                            output=output.decode().strip())
+            else:
+                body = dict(status=dict(execution_time=1000, type='FAILED',
+                                        message='Requested algorithm can not be executed with the given data'),
+                            output="None")
             response = self._app.response_class(
                 response=json.dumps(body),
                 status=200,

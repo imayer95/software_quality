@@ -2,4 +2,6 @@ import os
 import sys
 import platform
 
-print(os.getcwd())
+a = list()
+
+print(list is list)
