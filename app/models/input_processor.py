@@ -16,5 +16,4 @@ class InputFormatter(object):
                     formatted_input += str(item) + ' '
             else:
                 formatted_input += str(input_data[key]) + ' '
-        print('WWWWWWWWWWWWWWWWWWWWWWWWWW ', formatted_input)
         return formatted_input

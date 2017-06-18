@@ -19,8 +19,8 @@ class AlgorithmExecutor(object):
             print("CMD> ", cmd)
 
             child = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
-            output = child.communicate()[0]
-            return output
+            output, error = child.communicate()
+            return output, error
         elif language == 'java':
 
             cmd = 'javac' + ' ' + path + '.java '
@@ -32,9 +32,9 @@ class AlgorithmExecutor(object):
             cmd = 'java -classpath ' + settings.JAVA_DIRECTORY + ' ' + self._algo + ' ' + formatted_input
             print("CMD> ", cmd)
 
-            child = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
-            output = child.communicate()[0]
-            return output
+            child = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            output, error = child.communicate()
+            return output, error
 
 
 class Algorithm(object):
@@ -65,12 +65,15 @@ class Algorithm(object):
                     return False
                 else:
                     if not field.type() == type(given_input[field.name()]):
-                        print(field.type(), type(given_input[field.name()]))
                         return False
         return True
 
     def execute(self, language: str, path: str, formatted_input: str):
-        return self._executor.execute(language, path, formatted_input)
+        output, error = self._executor.execute(language, path, formatted_input)
+        if error:
+            return error
+        else:
+            return output
 
     @staticmethod
     def __retrieve_model(algo: str) -> Model:

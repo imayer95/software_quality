@@ -7,6 +7,10 @@ class Complexity(object):
         pass
 
     def almost_equal(self, first, second):
+        difference = second - first
+
+        if abs(difference) <= 50:
+            return True
         if not len(str(first)) == len(str(second)):
             return False
         else:

@@ -1,3 +1,4 @@
+from app.models.complexity_models.o_of_log_n import OOfLogN
 from app.models.complexity_models.o_of_n import OOfN
 from app.models.complexity_models.o_of_n_square import OOfNSquare
 
@@ -8,6 +9,7 @@ class ComplexityManager(object):
         self._complexities = list()
         self._complexities.append(OOfN())
         self._complexities.append(OOfNSquare())
+        self._complexities.append(OOfLogN())
 
     def get_complexity(self, time1, time2):
         for complexity in self._complexities:

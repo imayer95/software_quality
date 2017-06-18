@@ -10,10 +10,8 @@ class TimeOutThread(Thread):
         self._timeout = timeout
 
     def run(self):
-        print('wating for time out')
         time.sleep(self._timeout)
         try:
-            print('killing process')
             self._process.kill()
         except:
-            print('error killing')
+            pass

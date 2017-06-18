@@ -2,6 +2,7 @@
 module that handles the subprocess calls of the system
 """
 import os
+import sys
 import subprocess
 from subprocess import check_output, STDOUT
 
@@ -10,7 +11,6 @@ import time
 from app import settings
 from app.models.input_processor import InputFormatter
 from app.models.threads import TimeOutThread
-
 
 class CompileStatus(dict):
     def __init__(self, status, message, **kwargs):
@@ -54,12 +54,29 @@ class Executor(object):
     def set_unique_id(self, id_):
         pass
 
+    def _run_process(self, cmd):
+        start = int(round(time.time() * 1000))
+        child = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        try:
+            output, error = child.communicate(timeout=300)
+        except subprocess.TimeoutExpired:
+            return None
+        end = int(round(time.time() * 1000))
+        output = output.decode()
+        error = error.decode()
+        if not error == '':
+            return ExecutionStatus(False, 'Error execution program',
+                                   error.replace('\r', '').replace('\n', '').replace('\t', ''), int(end - start))
+        else:
+            return ExecutionStatus(True, 'Execution done',
+                                   output.replace('\r', '').replace('\n', '').replace('\t', ''), int(end - start))
+
 
 class JavaExecution(Executor):
 
     def __init__(self):
         super().__init__()
-        self.__unique_id = -1
+        self.__unique_id = "-1"
 
     def set_unique_id(self, id_):
         self.__unique_id = id_
@@ -90,36 +107,30 @@ class JavaExecution(Executor):
               compile_files[0].split('.')[0] + ' ' + formatted_input
         print("CMD> ", cmd)
 
-        start = int(round(time.time() * 1000))
-        child = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        try:
-            output, error = child.communicate(timeout=300)
-        except subprocess.TimeoutExpired:
-            return None
-        end = int(round(time.time() * 1000))
-        output = output.decode()
-        error = error.decode()
-        if not error == '':
-            return ExecutionStatus(False, 'Error execution program',
-                                   error.replace('\r', '').replace('\n', '').replace('\t', ''), int(end-start))
-        else:
-            return ExecutionStatus(True, 'Execution done',
-                                   output.replace('\r', '').replace('\n', '').replace('\t', ''), int(end-start))
+        return self._run_process(cmd)
 
 
 class PythonExecutor(Executor):
     def __init__(self):
         super().__init__()
-        self._unique_id = -1
+        self.__unique_id = "-1"
 
     def set_unique_id(self, id_):
-        pass
+        self.__unique_id = id_
 
     def compile(self, source_code):
-        return False
+        if not os.path.exists(settings.TEMP_COMPILATION_DIRECTORY + self.__unique_id):
+            os.mkdir(settings.TEMP_COMPILATION_DIRECTORY + self.__unique_id)
+        with open(settings.TEMP_COMPILATION_DIRECTORY + self.__unique_id + 'dump.py', 'w') as source_file:
+            source_file.write(source_code)
+            source_file.close()
+        return CompileStatus(True, '')
 
     def execute(self, input_data):
-        return False
+        formatted_input = self._formatter.format_from_dict(input_data)
+
+        cmd = 'python ' + settings.TEMP_COMPILATION_DIRECTORY + self.__unique_id + 'dump.py ' + formatted_input
+        return self._run_process(cmd)
 
 
 class ExecutionController(object):
@@ -149,6 +160,4 @@ class ExecutionController(object):
             return ExecutionStatus(False, 'Compile failed', 'None', -1)
 
     def __generate_unique_id(self, source_code):
-        return str(hash(source_code)) + '\\'
-
-
+        return str(hash(source_code)) + '/'

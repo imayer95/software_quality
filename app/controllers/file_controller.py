@@ -34,5 +34,5 @@ class AlgorithmRepository(object):
             for item in AlgorithmRepository.__list_dir(ALGORITHM_ROOT_DIRECTORY + class_):
                 if item.split('.')[0].upper().strip() == algorithm_name.upper().strip():
                     algorithm_path = ALGORITHM_ROOT_DIRECTORY+class_+'/'+item.split('.')[0]
-                    return format_path(algorithm_path), class_
+                    return algorithm_path, class_
         raise AlgorithmNotFound()

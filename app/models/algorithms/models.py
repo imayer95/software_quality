@@ -1,7 +1,7 @@
 from app.models.algorithms.meta_model import Model, FieldNecessity, FieldType
 
 
-class Test1Model(Model):
+class PythonSumModel(Model):
     """
     ORDER of field declaration is important
     """
@@ -17,7 +17,7 @@ class Test1Model(Model):
                 and not attr.startswith("__")]
 
 
-class Test2Model(Model):
+class JavaSumModel(Model):
     """
     ORDER of field declaration is important
     """
@@ -34,5 +34,5 @@ class Test2Model(Model):
 
 
 class Mappings(object):
-    test1 = Test1Model()
-    test2 = Test2Model()
+    PythonSum = PythonSumModel()
+    JavaSum = JavaSumModel()
