@@ -57,6 +57,13 @@ class Algorithm(object):
                 formatted_input += str(given_input[field.name()]) + ' '
         return formatted_input
 
+    def get_parameter_model(self):
+        fields = self.__model.fields()
+        field_list = []
+        for field in fields:
+            field_list.append(field.dict_repr())
+        return field_list
+
     def validate_input(self, given_input: dict) -> bool:
 
         for field in self.__model.fields():
@@ -71,9 +78,9 @@ class Algorithm(object):
     def execute(self, language: str, path: str, formatted_input: str):
         output, error = self._executor.execute(language, path, formatted_input)
         if error:
-            return error
+            return error.decode()
         else:
-            return output
+            return output.decode()
 
     @staticmethod
     def __retrieve_model(algo: str) -> Model:

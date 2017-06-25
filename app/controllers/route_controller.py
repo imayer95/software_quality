@@ -5,6 +5,8 @@ import json
 import os
 
 import subprocess
+
+import time
 from flask import Flask as Application, render_template, request
 
 from app import settings
@@ -31,6 +33,7 @@ class RouteController(object):
         self.__index()
         self.__execute()
         self.__complexity()
+        self.__local_complexity()
 
     def __index(self):
         @self._app.route('/')
@@ -122,6 +125,45 @@ class RouteController(object):
                         compile_status="Done",
                         execution_status=execution_result,
                         complexity=complexity_name)
+            response = self._app.response_class(
+                response=json.dumps(body),
+                status=200,
+                mimetype='application/json'
+            )
+            return response
+
+    def __local_complexity(self):
+        @self._app.route('/local_complexity', methods=['POST'])
+        def render_comp_execution():
+            algorithm_name = request.form['algorithm']
+            algorithm = Algorithm(algorithm_name)
+            path_, language = AlgorithmRepository.get_algorithm_path(algorithm_name)
+
+            params = algorithm.get_parameter_model()
+            for param in params:
+                param['growth'] = "exponential"
+
+            data = RandomDataGenerator(params, settings.AFFORDABLE_INT_LIMIT, settings.MULTIPLY_FACTOR)
+            complexity_manager = ComplexityManager(settings.MULTIPLY_FACTOR)
+
+            run_times = []
+            while data.next():
+                input_data = data.get_random_data()
+
+                print(input_data)
+
+                formatted_input = algorithm.get_formatted_input(input_data)
+                output = algorithm.execute(language, path_, formatted_input)
+                execution_time = int(output)
+                print("executionR ", execution_time)
+                if execution_time >= settings.RUN_TIME_LIMIT * 1000:
+                    run_times.append(execution_time)
+                run_times.append(execution_time)
+
+            complexity_name = complexity_manager.get_complexity(run_times[-2], run_times[-1])
+            body = dict(status=dict(type='SUCCESS',
+                                    message="Done",
+                                    complexity=str(complexity_name)))
             response = self._app.response_class(
                 response=json.dumps(body),
                 status=200,

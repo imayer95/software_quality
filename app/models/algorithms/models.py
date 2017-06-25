@@ -33,6 +33,22 @@ class JavaSumModel(Model):
                 and not attr.startswith("__")]
 
 
+class BFSModel(Model):
+    """
+    ORDER of field declaration is important
+    """
+    param1 = Model.Field('param1', FieldNecessity.REQUIRED, FieldType.INT)
+
+    def __init__(self):
+        pass
+
+    def fields(self):
+        return [self.__getattribute__(attr) for attr in dir(self)
+                if not callable(getattr(self, attr))
+                and not attr.startswith("__")]
+
+
 class Mappings(object):
     PythonSum = PythonSumModel()
     JavaSum = JavaSumModel()
+    BFS = BFSModel()

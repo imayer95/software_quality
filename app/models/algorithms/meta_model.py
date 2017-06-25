@@ -18,12 +18,12 @@ class FieldType(object):
 
 class Model(object):
     """
-    
+
     """
 
     class Field(object):
         """
-        
+
         """
 
         def __init__(self, name:str, necessity: FieldNecessity, type: FieldType):
@@ -39,6 +39,33 @@ class Model(object):
 
         def name(self):
             return self.__name
+
+        def dict_repr(self):
+            type_ = "int"
+            if isinstance(self.__type, str):
+                type_ = "str"
+            if isinstance(self.__type, list):
+                type_ = "array"
+            dr = {"type": type_}
+            return dr
+
+        def __str__(self):
+            type_ = "int"
+            if isinstance(self.__type, str):
+                type_ = "str"
+            if isinstance(self.__type, list):
+                type_ = "array"
+            dr = {"type": type_}
+            return str(dr)
+
+        def __repr__(self):
+            type_ = "int"
+            if isinstance(self.__type, str):
+                type_ = "str"
+            if isinstance(self.__type, list):
+                type_ = "array"
+            dr = {"type": type_}
+            return str(dr)
 
     def fields(self) -> Iterable[Field]:
         pass
