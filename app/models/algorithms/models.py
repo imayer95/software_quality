@@ -1,3 +1,7 @@
+"""
+Model implementations for the stored algorithms.
+"""
+
 from app.models.algorithms.meta_model import Model, FieldNecessity, FieldType
 
 
@@ -64,6 +68,9 @@ class DFSModel(Model):
 
 
 class Mappings(object):
+    """
+    Mappings between the stored algorithm name (Case Sensitive, exact match) and the model.
+    """
     PythonSum = PythonSumModel()
     JavaSum = JavaSumModel()
     BFS = BFSModel()

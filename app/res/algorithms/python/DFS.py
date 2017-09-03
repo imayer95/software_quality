@@ -5,6 +5,12 @@ import time
 
 
 def dfs(graph, start):
+    """
+    Implementation of the depth first search algorithm.
+    :param graph: The graph represented as a dictionary where each node has a list of children.
+    :param start: The root of the graph.
+    :return:
+    """
     visited, stack = set(), [start]
     while stack:
         vertex = stack.pop()
@@ -15,6 +21,11 @@ def dfs(graph, start):
 
 
 def create_random_tree(n):
+    """
+    Method that generates a random graph based on a given number of nodes.
+    :param n: The number of nodes.
+    :return: returns a random graph with n noes.
+    """
     a = list(range(2, n))
     b = [1]
 
@@ -37,11 +48,13 @@ def create_random_tree(n):
 
     return g
 
-nodes = int(sys.argv[1])
-
+nodes = int(sys.argv[1])  # Read the number of nodes from the script arguments.
 g = create_random_tree(nodes)
+
+# Count the time it takes to parse all the nodes
 start = int(round(time.time() * 1000))
 dfs(g, 1)
 end = int(round(time.time() * 1000))
-print(end-start)
+
+print(end-start)  # "Return" the time it took to parse the graph.
 

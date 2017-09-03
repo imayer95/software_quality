@@ -5,13 +5,18 @@ import time
 
 
 def bfs2(graph, start):
+    """
+    Implementation of the breadth first search algorithm.
+    :param graph: The graph represented as a dictionary where each node has a list of children.
+    :param start: The root of the graph.
+    :return:
+    """
     visited = set()
     visited.add(start)
     queue = [start]
-    c = 0
     dr = 0
     while dr < len(queue):
-        c += 1
+
         vertex = queue[dr]
         dr += 1
         for i in graph[vertex]:
@@ -21,6 +26,11 @@ def bfs2(graph, start):
 
 
 def create_random_tree(n):
+    """
+    Method that generates a random graph based on a given number of nodes.
+    :param n: The number of nodes.
+    :return: returns a random graph with n noes.
+    """
     a = list(range(2, n))
     b = [1]
 
@@ -30,7 +40,6 @@ def create_random_tree(n):
     for i in range(2, n):
         t = random.randint(1, i-1)
         r = random.randint(i, n)
-
 
         x = a.pop(r-i-1)
         b.append(x)
@@ -44,11 +53,13 @@ def create_random_tree(n):
 
     return g
 
-nodes = int(sys.argv[1])
-
+nodes = int(sys.argv[1])  # Read the number of nodes from the script arguments.
 g = create_random_tree(nodes)
+
+# Count the time it takes to parse all the nodes
 start = int(round(time.time() * 1000))
 bfs2(g, 1)
 end = int(round(time.time() * 1000))
-print(end-start)
+
+print(end-start)  # "Return" the time it took to parse the graph.
 
